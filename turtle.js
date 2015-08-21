@@ -1,3 +1,5 @@
+var _ = require("lodash");
+
 function Turtle(onscreen) {
     this._onscreen = onscreen;
     this._position = [0.0, 0.0];
@@ -5,6 +7,9 @@ function Turtle(onscreen) {
     this._drawing = true;
     this._surface = this.newSurfaceLayer();
     this._indicator = this.newIndicatorLayer();
+    this._queue = [];
+    this._forResume = [];
+    this._speed = 10;
 }
 
 Turtle.prototype.newSurfaceLayer = function() {
@@ -19,7 +24,7 @@ Turtle.prototype.newSurfaceLayer = function() {
     c.fillStyle = "#000040";
     c.fillRect(0, 0, layer.width, layer.height);
 
-    c.strokeStyle = "#ffff40";
+    c.strokeStyle = "white";
 
     c.translate(layer.width / 2, layer.height / 2);
     c.scale(1, -1);
@@ -63,6 +68,16 @@ Turtle.prototype._drawIndicator = function() {
 };
 
 Turtle.prototype.update = function() {
+    if (_.isEmpty(this._queue)) {
+        return;
+    }
+    for (var i = 0; i < this._speed; i++) {
+        var task = this._queue.shift();
+        if (!task) {
+            return;
+        }
+        task();
+    }
 };
 
 Turtle.prototype.draw = function() {
@@ -74,28 +89,34 @@ Turtle.prototype.draw = function() {
 };
 
 Turtle.prototype.forward = function(k) {
-    if (this._drawing) {
-        var c = this._surface.getContext("2d");
-        c.save();
-        c.translate(this._position[0], this._position[1]);
-        c.rotate(Math.PI / 180 * this._angle);
-        c.beginPath();
-        c.moveTo(0, 0);
-        c.lineTo(0, k);
-        c.stroke();
-        c.restore();
-    }
+    var s = k > 0 ? 1 : -1;
+    this.repeat(Math.floor(Math.abs(k)), function() {
+        if (this._drawing) {
+            var c = this._surface.getContext("2d");
+            c.save();
+            c.translate(this._position[0], this._position[1]);
+            c.rotate(Math.PI / 180 * this._angle);
+            c.beginPath();
+            c.moveTo(0, 0);
+            c.lineTo(0, s);
+            c.stroke();
+            c.restore();
+        }
 
-    this._position[0] += k * Math.cos(Math.PI / 180 * (this._angle + 90));
-    this._position[1] += k * Math.sin(Math.PI / 180 * (this._angle + 90));
+        this._position[0] += s * Math.cos(Math.PI / 180 * (this._angle + 90));
+        this._position[1] += s * Math.sin(Math.PI / 180 * (this._angle + 90));
+    });
 };
 
 Turtle.prototype.right = function(k) {
-    this._angle -= k;
+    var s = k > 0 ? 1 : -1;
+    this.repeat(Math.floor(Math.abs(k)), function() {
+        this._angle -= s;
+    });
 };
 
 Turtle.prototype.left = function(k) {
-    this._angle += k;
+    return this.right(-k);
 };
 
 Turtle.prototype.backward = function(k) {
@@ -104,38 +125,80 @@ Turtle.prototype.backward = function(k) {
 
 Turtle.prototype.repeat = function(k, fn) {
     for (var i = 0; i < k; i++) {
-        fn.call(this);
+        this._enqueue(function() {
+            var next = this._queue;
+            this._queue = [];
+            fn.call(this);
+            this._queue = this._queue.concat(next);
+        });
     }
 };
 
 Turtle.prototype.penup = function() {
-    this._drawing = false;
+    this._enqueue(function() {
+        this._drawing = false;
+    });
 };
 
 Turtle.prototype.pendown = function() {
-    this._drawing = true;
+    this._enqueue(function() {
+        this._drawing = true;
+    });
 };
 
 Turtle.prototype.pencolor = function(c) {
-    this._surface.getContext("2d").strokeStyle = c;
+    this._enqueue(function() {
+        this._surface.getContext("2d").strokeStyle = c;
+    });
 };
 
 Turtle.prototype.clearscreen = function() {
-    var c = this._surface.getContext("2d");
-    c.fillRect(this._surface.width / -2,
-               this._surface.height / -2,
-               this._surface.width,
-               this._surface.height);
-    this._position = [0.0, 0.0];
-    this._angle = 0.0;
+    this._enqueue(function() {
+        var c = this._surface.getContext("2d");
+        c.fillRect(this._surface.width / -2,
+                   this._surface.height / -2,
+                   this._surface.width,
+                   this._surface.height);
+        this._position = [0.0, 0.0];
+        this._angle = 0.0;
+        this._surface.getContext("2d").strokeStyle = "white";
+    });
 };
 
 Turtle.prototype.setposition = function(x, y) {
-    this._position = [x, y];
+    this._enqueue(function() {
+        this._position[0] = x;
+        this._position[1] = y;
+    });
 };
 
 Turtle.prototype.setangle = function(angle) {
-    this._angle = angle;
+    this._enqueue(function() {
+        this._angle = angle;
+    });
+};
+
+Turtle.prototype._enqueue = function(fn) {
+    this._queue.push(fn.bind(this));
+};
+
+Turtle.prototype.setspeed = function(s) {
+    this._speed = s;
+};
+
+Turtle.prototype.stop = function() {
+    this._queue = [];
+    this._forResume = [];
+};
+
+Turtle.prototype.pause = function() {
+    this._forResume = this._queue;
+    this._queue = [];
+};
+
+Turtle.prototype.resume = function() {
+    this._queue = this._forResume;
+    this._forResume = [];
 };
 
 module.exports = Turtle;
