@@ -60,8 +60,8 @@ Turtle.prototype._drawIndicator = function() {
     c.rotate(Math.PI / 180 * this._angle);
     c.beginPath();
     c.moveTo(0, 5);
-    c.lineTo(-10, -5);
-    c.lineTo(10, -5);
+    c.lineTo(-6, -7);
+    c.lineTo(6, -7);
     c.closePath();
     c.stroke();
     c.restore();
