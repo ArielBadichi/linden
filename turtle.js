@@ -1,4 +1,4 @@
-var _ = require("lodash");
+var isEmpty = require("lodash/lang/isEmpty");
 
 function Turtle(onscreen) {
     this._onscreen = onscreen;
@@ -69,7 +69,7 @@ Turtle.prototype._drawIndicator = function() {
 };
 
 Turtle.prototype.update = function() {
-    if (_.isEmpty(this._queue)) {
+    if (isEmpty(this._queue)) {
         return;
     }
     for (var i = 0; i < Math.max(this._speed, 1); i++) {
@@ -202,7 +202,7 @@ Turtle.prototype.pushstate = function() {
 
 Turtle.prototype.popstate = function() {
     this._enqueue(function() {
-        if (_.isEmpty(this._states)) {
+        if (isEmpty(this._states)) {
             return;
         }
         var state = this._states.pop();

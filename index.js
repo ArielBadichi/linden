@@ -1,4 +1,4 @@
-var _ = require("lodash");
+var defaults = require("lodash/object/defaults");
 var Turtle = require("./turtle");
 
 var turtle;
@@ -92,7 +92,7 @@ function prefixes(p, s, i) {
 }
 
 function lindenmayer(config) {
-    _.defaults(config, {
+    defaults(config, {
         iterations: 10,
         size: 10,
         speed: 0
