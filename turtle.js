@@ -8,7 +8,8 @@ function Turtle(onscreen) {
     this._surface = this.newSurfaceLayer();
     this._indicator = this.newIndicatorLayer();
     this._queue = [];
-    this._forResume = [];
+    this._forResume = null;
+    this._states = [];
     this._speed = 10;
 }
 
@@ -71,7 +72,7 @@ Turtle.prototype.update = function() {
     if (_.isEmpty(this._queue)) {
         return;
     }
-    for (var i = 0; i < this._speed; i++) {
+    for (var i = 0; i < Math.max(this._speed, 1); i++) {
         var task = this._queue.shift();
         if (!task) {
             return;
@@ -89,8 +90,7 @@ Turtle.prototype.draw = function() {
 };
 
 Turtle.prototype.forward = function(k) {
-    var s = k > 0 ? 1 : -1;
-    this.repeat(Math.floor(Math.abs(k)), function() {
+    var move = function(s) {
         if (this._drawing) {
             var c = this._surface.getContext("2d");
             c.save();
@@ -105,13 +105,31 @@ Turtle.prototype.forward = function(k) {
 
         this._position[0] += s * Math.cos(Math.PI / 180 * (this._angle + 90));
         this._position[1] += s * Math.sin(Math.PI / 180 * (this._angle + 90));
+    }.bind(this);
+
+    this.repeat(1, function() {
+        if (this._speed > 0) {
+            var s = k > 0 ? 1 : -1;
+            this.repeat(Math.floor(Math.abs(k)), function() {
+                move(s);
+            });
+        } else {
+            move(k);
+        }
     });
+
 };
 
 Turtle.prototype.right = function(k) {
-    var s = k > 0 ? 1 : -1;
-    this.repeat(Math.floor(Math.abs(k)), function() {
-        this._angle -= s;
+    this.repeat(1, function() {
+        if (this._speed > 0) {
+            var s = k > 0 ? 1 : -1;
+            this.repeat(Math.floor(Math.abs(k)), function() {
+                this._angle -= s;
+            });
+        } else {
+            this._angle -= k;
+        }
     });
 };
 
@@ -159,7 +177,8 @@ Turtle.prototype.clearscreen = function() {
                    this._surface.height / -2,
                    this._surface.width,
                    this._surface.height);
-        this._position = [0.0, 0.0];
+        this._position[0] = 0.0;
+        this._position[1] = 0.0;
         this._angle = 0.0;
         this._surface.getContext("2d").strokeStyle = "white";
     });
@@ -169,6 +188,27 @@ Turtle.prototype.setposition = function(x, y) {
     this._enqueue(function() {
         this._position[0] = x;
         this._position[1] = y;
+    });
+};
+
+Turtle.prototype.pushstate = function() {
+    this._enqueue(function() {
+        this._states.push({
+            pos: [this._position[0], this._position[1]],
+            angle: this._angle
+        });
+    });
+};
+
+Turtle.prototype.popstate = function() {
+    this._enqueue(function() {
+        if (_.isEmpty(this._states)) {
+            return;
+        }
+        var state = this._states.pop();
+        this._position[0] = state.pos[0];
+        this._position[1] = state.pos[1];
+        this._angle = state.angle;
     });
 };
 
@@ -188,17 +228,26 @@ Turtle.prototype.setspeed = function(s) {
 
 Turtle.prototype.stop = function() {
     this._queue = [];
-    this._forResume = [];
+    this._forResume = null;
+    this._states = [];
 };
 
 Turtle.prototype.pause = function() {
-    this._forResume = this._queue;
+    this._forResume = {
+        queue: this._queue,
+        states: this._states
+    };
     this._queue = [];
 };
 
 Turtle.prototype.resume = function() {
-    this._queue = this._forResume;
-    this._forResume = [];
+    if (!this._forResume) {
+        return;
+    }
+
+    this._queue = this._forResume.queue;
+    this._states = this._forResume.states;
+    this._forResume = null;
 };
 
 module.exports = Turtle;
