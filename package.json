@@ -1,12 +1,15 @@
 {
-    "name": "linden",
-    "version": "0.0.1",
-    "description": "Code for talk about turtles & l-systems",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "watchify index.js -o static/bundle.js -dv"
-    },
-    "author": "arikba",
-    "license": "MIT"
+  "name": "linden",
+  "version": "0.0.1",
+  "description": "Code for talk about turtles & l-systems",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify index.js -o static/bundle.js -dv"
+  },
+  "author": "arikba",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
 }
