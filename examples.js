@@ -63,6 +63,9 @@ function expand(config) {
                 if (state.startsWith(key, j)) {
                     prefix = key;
                     subst = config.rules[key];
+                    if (Array.isArray(subst)) {
+                        subst = subst[Math.floor(Math.random() * subst.length)];
+                    }
                     break;
                 }
             }
@@ -92,6 +95,11 @@ function lindenmayer(config) {
             case "A":
             case "B":
                 turtle.forward(config.size);
+                break;
+            case "f":
+                turtle.penup();
+                turtle.forward(config.size);
+                turtle.pendown();
                 break;
             case "+":
                 turtle.left(config.angle);
@@ -145,6 +153,17 @@ e.plant = lindenmayer({
     iterations: 5
 });
 
+e.plant2 = lindenmayer({
+    start: "X",
+    rules: {
+        X: "F{+X}{-X}FX",
+        F: "FF"
+    },
+    angle: 25.7,
+    size: 4,
+    iterations: 5
+});
+
 e.snowflake = lindenmayer({
     start: "F++F++F",
     rules: {
@@ -165,6 +184,27 @@ e.koch = lindenmayer({
     iterations: 4
 });
 
+e.koch2 = lindenmayer({
+    start: "F-F-F-F",
+    rules: {
+        F: "F+FF-FF-F-F+F+FF-F-F+F+FF+FF-F"
+    },
+    angle: 90,
+    size: 3,
+    iterations: 2
+});
+
+e.koch3 = lindenmayer({
+    start: "F+F+F+F",
+    rules: {
+        F: "F+f-FF+F+FF+Ff+FF-f+FF-F-FF-Ff-FFF",
+        f: "ffffff"
+    },
+    angle: 90,
+    size: 3,
+    iterations: 2
+});
+
 e.pythagoras = lindenmayer({
     start: "A",
     rules: {
@@ -174,4 +214,29 @@ e.pythagoras = lindenmayer({
     angle: 45,
     size: 5,
     iterations: 6
+});
+
+e.gosper = lindenmayer({
+    start: "A",
+    rules: {
+        A: "A+B++B-A--AA-B+",
+        B: "-A+BB++B+A--A-B"
+    },
+    angle: 60,
+    size: 10,
+    iterations: 3
+});
+
+e.splant = lindenmayer({
+    start: "F",
+    rules: {
+        F: [
+            "F{+F}F{-F}F",
+            "F{+F}F",
+            "F{-F}F"
+        ]
+    },
+    angle: 25,
+    size: 4,
+    iterations: 5
 });
