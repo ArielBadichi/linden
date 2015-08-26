@@ -52,19 +52,6 @@ e.ninja = function(turtle) {
     });
 }
 
-function prefixes(p, s, i) {
-    var len = s.length;
-    if ((len - i) < p.length) {
-        return false;
-    }
-    for (var j = 0; j < p.length; j++) {
-        if (p[j] !== s[j + i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function expand(config) {
     var state = config.start;
     for (var i = 0; i < config.iterations; i++) {
@@ -73,7 +60,7 @@ function expand(config) {
             var prefix = null;
             var subst = null;
             for (var key in config.rules) {
-                if (prefixes(key, state, j)) {
+                if (state.startsWith(key, j)) {
                     prefix = key;
                     subst = config.rules[key];
                     break;
