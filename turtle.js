@@ -9,6 +9,7 @@ function Turtle(onscreen) {
     this._forResume = null;
     this._states = [];
     this._speed = 10;
+    this._show = true;
 }
 
 Turtle.prototype._newLayer = function(strokeStyle, fillStyle) {
@@ -70,7 +71,9 @@ Turtle.prototype.draw = function() {
     this._drawIndicator();
     var c = this._onscreen.getContext("2d");
     c.drawImage(this._surface, 0, 0);
-    c.drawImage(this._indicator, 0, 0);
+    if (this._show) {
+        c.drawImage(this._indicator, 0, 0);
+    }
 };
 
 Turtle.prototype.forward = enqueued(function(k) {
@@ -172,6 +175,14 @@ Turtle.prototype.popstate = enqueued(function() {
 
 Turtle.prototype.setangle = enqueued(function(angle) {
     this._angle = angle;
+});
+
+Turtle.prototype.hide = enqueued(function() {
+    this._show = false;
+});
+
+Turtle.prototype.show = enqueued(function() {
+    this._show = true;
 });
 
 Turtle.prototype._enqueue = function(fn) {
