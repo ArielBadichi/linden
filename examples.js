@@ -1,5 +1,7 @@
 var e = module.exports;
 
+// Basic turtle graphics.
+
 e.line = function(turtle) {
     turtle.forward(50);
 }
@@ -51,6 +53,8 @@ e.ninja = function(turtle) {
         turtle.right(2);
     });
 }
+
+// Lindenmayer begins...
 
 function expand(config) {
     var state = config.start;
@@ -120,6 +124,8 @@ function lindenmayer(config) {
     }
 }
 
+// Simple ones.
+
 e.dragon = lindenmayer({
     start: "FX",
     rules: {
@@ -140,28 +146,6 @@ e.sierpinsky = lindenmayer({
     angle: 60,
     size: 2,
     iterations: 6
-});
-
-e.plant = lindenmayer({
-    start: "FX",
-    rules: {
-        X: "F-{{X}+}+F{+FX}-X",
-        F: "FF"
-    },
-    angle: 25,
-    size: 2,
-    iterations: 5
-});
-
-e.plant2 = lindenmayer({
-    start: "X",
-    rules: {
-        X: "F{+X}{-X}FX",
-        F: "FF"
-    },
-    angle: 25.7,
-    size: 4,
-    iterations: 5
 });
 
 e.snowflake = lindenmayer({
@@ -194,6 +178,19 @@ e.koch2 = lindenmayer({
     iterations: 2
 });
 
+e.gosper = lindenmayer({
+    start: "A",
+    rules: {
+        A: "A+B++B-A--AA-B+",
+        B: "-A+BB++B+A--A-B"
+    },
+    angle: 60,
+    size: 10,
+    iterations: 3
+});
+
+// With penup forward.
+
 e.koch3 = lindenmayer({
     start: "F+F+F+F",
     rules: {
@@ -203,6 +200,30 @@ e.koch3 = lindenmayer({
     angle: 90,
     size: 3,
     iterations: 2
+});
+
+// With state push/pop.
+
+e.plant = lindenmayer({
+    start: "FX",
+    rules: {
+        X: "F-{{X}+}+F{+FX}-X",
+        F: "FF"
+    },
+    angle: 25,
+    size: 2,
+    iterations: 5
+});
+
+e.plant2 = lindenmayer({
+    start: "X",
+    rules: {
+        X: "F{+X}{-X}FX",
+        F: "FF"
+    },
+    angle: 25.7,
+    size: 4,
+    iterations: 5
 });
 
 e.pythagoras = lindenmayer({
@@ -216,16 +237,7 @@ e.pythagoras = lindenmayer({
     iterations: 6
 });
 
-e.gosper = lindenmayer({
-    start: "A",
-    rules: {
-        A: "A+B++B-A--AA-B+",
-        B: "-A+BB++B+A--A-B"
-    },
-    angle: 60,
-    size: 10,
-    iterations: 3
-});
+// Stochastic.
 
 e.splant = lindenmayer({
     start: "F",
