@@ -5,10 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "watchify index.js -o static/bundle.js -dv",
-    "build": "NODE_ENV=production browserify index.js | uglifyjs -m -c > static/bundle.js"
+    "watch": "watchify -t [ reactify ] index.js -o static/bundle.js -dv",
+    "build": "NODE_ENV=production browserify -t [ reactify ] index.js | uglifyjs -m -c > static/bundle.js"
   },
   "author": "arikba",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "bootstrap": "^3.3.5",
+    "react": "^0.13.3",
+    "react-bootstrap": "^0.25.1",
+    "react-codemirror": "^0.1.4",
+    "reactify": "^1.1.1"
+  }
 }
