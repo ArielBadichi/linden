@@ -52,7 +52,14 @@ var Playground = React.createClass({
         requestAnimationFrame(this.animate);
     },
     run: function() {
+        var startTime = Date.now();
         eval(this.props.code);
+        if (this.turtle) {
+            this.turtle.call(function() {
+                var endTime = Date.now();
+                console.log("Run took %s ms", endTime - startTime);
+            });
+        }
     },
     reset: function() {
         if (this.turtle) {

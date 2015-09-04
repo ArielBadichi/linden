@@ -129,6 +129,10 @@ Turtle.prototype.repeat = function(k, fn) {
     }
 };
 
+Turtle.prototype.call = function(fn) {
+    this._enqueue(fn);
+};
+
 Turtle.prototype.penup = enqueued(function() {
     this._drawing = false;
 });
