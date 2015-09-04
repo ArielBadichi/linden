@@ -1,5 +1,6 @@
 var React = require("react");
 var ReactBootstrap = require("react-bootstrap");
+var superagent = require("superagent");
 var CodeMirror = require("react-codemirror");
 require("react-codemirror/node_modules/codemirror/mode/javascript/javascript");
 var Turtle = require("./turtle");
@@ -23,18 +24,13 @@ var Nav = React.createClass({
 var Bullets = React.createClass({
     render: function() {
         var items = this.props.items.map(function(item) {
-            return <Row><Col xs={12}><h2>- {item}</h2></Col></Row>;
+            return <Row key={item}><Col xs={12}><h2>- {item}</h2></Col></Row>;
         });
         return <Grid>{items}</Grid>;
     }
 });
 
 var Playground = React.createClass({
-    getInitialState: function() {
-        return {
-            code: this.props.code || ""
-        };
-    },
     componentDidMount: function() {
         var canvas = React.findDOMNode(this.refs.canvas);
         if (canvas) {
@@ -56,16 +52,13 @@ var Playground = React.createClass({
         requestAnimationFrame(this.animate);
     },
     run: function() {
-        eval(this.state.code);
+        eval(this.props.code);
     },
     reset: function() {
         if (this.turtle) {
             this.turtle.stop();
             this.turtle.clearscreen();
         }
-    },
-    updateCode: function(newCode) {
-        this.setState({code: newCode});
     },
     render: function() {
         var options = {
@@ -74,7 +67,7 @@ var Playground = React.createClass({
             autofocus: true,
             indentUnit: 4
         };
-        var editor = <CodeMirror value={this.state.code} options={options} onChange={this.updateCode} />;
+        var editor = <CodeMirror value={this.props.code} options={options} onChange={this.props.onChange} />;
 
         var canvas = (
                 <div className="canvas-wrap">
@@ -90,12 +83,33 @@ var Playground = React.createClass({
 });
 
 var Slide = React.createClass({
+    getInitialState: function() {
+        return {
+            code: ""
+        };
+    },
+    updateCode: function(newCode) {
+        this.setState({code: newCode});
+    },
+    componentDidMount: function() {
+        if (this.props.description.playground) {
+            var url = "/snippets/" + this.props.description.playground + ".js";
+            superagent.get(url)
+                .end(function(err, res) {
+                    if (err) {
+                        console.log("Snippet GET error:", err);
+                        return;
+                    }
+                    this.setState({code: res.text});
+                }.bind(this));
+        }
+    },
     render: function() {
         var d = this.props.description;
         var headline = d.headline && <h1 className="text-center">{d.headline}</h1>;
         var image = d.image && <img className="center-block" src={d.image} />;
         var bullets = d.bullets && <Bullets items={d.bullets} />;
-        var playground = d.turtle && <Playground code={d.turtle} />;
+        var playground = d.playground && <Playground code={this.state.code} onChange={this.updateCode} />;
         return <div>{headline}{image}{bullets}{playground}</div>;
     }
 });
