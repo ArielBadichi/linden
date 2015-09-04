@@ -1,10 +1,7 @@
-turtle.pencolor('blue');
-turtle.repeat(50, function() {
-    turtle.forward(50);
-    turtle.left(123);
-});
-turtle.pencolor('red');
-turtle.repeat(50, function() {
-    turtle.forward(100);
-    turtle.left(123);
-});
+for (var i = 0; i < 360; i++) {
+    turtle.pencolor([0, 45, 135].map(function(d) {
+        return Math.floor(127 * Math.sin((i + d) * Math.PI / 180.0)) + 128;
+    }));
+    turtle.forward(1);
+    turtle.left(1);
+}

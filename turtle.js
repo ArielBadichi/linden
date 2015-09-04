@@ -142,6 +142,9 @@ Turtle.prototype.pendown = enqueued(function() {
 });
 
 Turtle.prototype.pencolor = enqueued(function(c) {
+    if (Array.isArray(c)) {
+        c = "rgb(" + c.join(",") + ")";
+    }
     this._surface.getContext("2d").strokeStyle = c;
 });
 
