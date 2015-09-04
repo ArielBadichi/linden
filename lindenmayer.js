@@ -1,42 +1,13 @@
-function expand(config) {
-    var state = config.start;
-    for (var i = 0; i < config.iterations; i++) {
-        var newstate = [];
-        for (var j = 0; j < state.length;) {
-            var prefix = null;
-            var subst = null;
-            for (var key in config.rules) {
-                if (state.startsWith(key, j)) {
-                    prefix = key;
-                    subst = config.rules[key];
-                    if (Array.isArray(subst)) {
-                        subst = subst[Math.floor(Math.random() * subst.length)];
-                    }
-                    break;
-                }
-            }
-            if (subst) {
-                newstate.push(subst);
-                j += prefix.length;
-            } else {
-                newstate.push(state[j]);
-                j++;
-            }
-        }
-        state = newstate.join("");
-    }
-    return state;
-}
-
 function lindenmayer(turtle) {
     return function(config) {
-        var state = expand(config);
-        console.log("State length", state.length);
-
         turtle.setspeed(0);
+        var instructions = expand(config);
+        for (var i in instructions) {
+            perform(instructions[i]);
+        }
 
-        for (var i = 0; i < state.length; i++) {
-            switch (state[i]) {
+        function perform(instruction) {
+            switch (instruction) {
             case "F":
             case "A":
             case "B":
@@ -64,6 +35,43 @@ function lindenmayer(turtle) {
             }
         }
     }
+}
+
+function expand(config) {
+    var value = config.start;
+    for (var i = 0; i < config.iterations; i++) {
+        value = expand1(value, config.rules);
+    }
+    return value;
+}
+
+function expand1(value, rules) {
+    var result = [];
+    var i = 0;
+    while (i < value.length) {
+        var e = expandPrefix(value, i, rules);
+        result.push(e.output);
+        i += e.consumed;
+    }
+    return result.join("");
+}
+
+function expandPrefix(value, i, rules) {
+    for (var candidate in rules) {
+        if (value.startsWith(candidate, i)) {
+            return {consumed: candidate.length, output: chooseOutput(rules[candidate])};
+        }
+    }
+    return {consumed: 1, output: value[i]};
+}
+
+function chooseOutput(x) {
+    return Array.isArray(x) ? randomElement(x) : x;
+}
+
+function randomElement(array) {
+    var k = Math.floor(array.length * Math.random());
+    return array[k];
 }
 
 module.exports = lindenmayer;

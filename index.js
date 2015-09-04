@@ -20,10 +20,19 @@ var Nav = React.createClass({
     }
 });
 
-var Slide = React.createClass({
+var Bullets = React.createClass({
+    render: function() {
+        var items = this.props.items.map(function(item) {
+            return <Row><Col xs={12}><h2>- {item}</h2></Col></Row>;
+        });
+        return <Grid>{items}</Grid>;
+    }
+});
+
+var Playground = React.createClass({
     getInitialState: function() {
         return {
-            code: this.props.description.turtle || ""
+            code: this.props.code || ""
         };
     },
     componentDidMount: function() {
@@ -56,72 +65,38 @@ var Slide = React.createClass({
         }
     },
     updateCode: function(newCode) {
-        this.setState({
-            code: newCode
-        });
+        this.setState({code: newCode});
     },
     render: function() {
-        var d = this.props.description;
+        var options = {
+            lineNumbers: true,
+            mode: "javascript",
+            autofocus: true,
+            indentUnit: 4
+        };
+        var editor = <CodeMirror value={this.state.code} options={options} onChange={this.updateCode} />;
 
-        var headline;
-        if (d.headline) {
-            headline = <h1 className="text-center">{d.headline}</h1>;
-        }
-
-        var image;
-        if (d.image) {
-            image = <img className="center-block" src={d.image} />;
-        }
-
-        var bullets;
-        if (d.bullets) {
-            var items = d.bullets.map(function(bullet) {
-                return <Row><Col xs={12}><h2>- {bullet}</h2></Col></Row>;
-            });
-            bullets = (
-                    <Grid>
-                    {items}
-                    </Grid>
-            );
-        }
-
-        var turtle;
-        if (d.turtle) {
-            var options = {
-                lineNumbers: true,
-                mode: "javascript",
-                autofocus: true,
-                indentUnit: 4
-            };
-            var editor = <CodeMirror value={this.state.code} options={options} onChange={this.updateCode} />;
-
-            var canvas = (
-                    <div className="canvas-wrap">
-                    <canvas ref="canvas" width={800} height={600} />
-                    </div>
-            );
-
-            var run = <Button bsStyle="primary" onClick={this.run}>Run</Button>;
-            var reset = <Button bsStyle="danger" onClick={this.reset}>Reset</Button>;
-
-            turtle = (
-                    <div className="clearfix">
-                    {canvas}
-                    {run}
-                    {reset}
-                    {editor}
-                    </div>
-            );
-        }
-
-        return (
-                <div>
-                {headline}
-                {image}
-                {bullets}
-                {turtle}
+        var canvas = (
+                <div className="canvas-wrap">
+                <canvas ref="canvas" width={800} height={600} />
                 </div>
-        )
+        );
+
+        var run = <Button bsStyle="primary" onClick={this.run}>Run</Button>;
+        var reset = <Button bsStyle="danger" onClick={this.reset}>Reset</Button>;
+
+        return <div className="clearfix">{canvas}{run}{reset}{editor}</div>;
+    }
+});
+
+var Slide = React.createClass({
+    render: function() {
+        var d = this.props.description;
+        var headline = d.headline && <h1 className="text-center">{d.headline}</h1>;
+        var image = d.image && <img className="center-block" src={d.image} />;
+        var bullets = d.bullets && <Bullets items={d.bullets} />;
+        var playground = d.turtle && <Playground code={d.turtle} />;
+        return <div>{headline}{image}{bullets}{playground}</div>;
     }
 });
 
@@ -140,14 +115,10 @@ var App = React.createClass({
         var slideNumber = this.state.slideNumber;
         var numSlides = this.props.slides.length;
         var nav = <Nav current={slideNumber} num={numSlides} onSelect={this.gotoSlide} />;
-
         var slide = <Slide key={slideNumber} description={this.props.slides[slideNumber - 1]} />;
-
         return (
                 <div>
-                <Grid>
-                <Row><Col xs={12}>{nav}</Col></Row>
-                </Grid>
+                <Grid><Row><Col xs={12}>{nav}</Col></Row></Grid>
                 {slide}
                 </div>
         );
