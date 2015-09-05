@@ -4,6 +4,6 @@ lindenmayer({
         F: 'F+F--F+F'
     },
     angle: 45,
-    size: 25,
+    size: 20,
     iterations: 0
 });
