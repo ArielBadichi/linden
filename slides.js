@@ -6,7 +6,7 @@ module.exports = [
     {
         headline: "A little about LOGO",
         bullets: [
-            "Programming language from the late 60s",
+            "Conceived in the late 60s by Seymour Papert and Wally Feurzeig",
             "Used mainly to teach concepts of programming",
             "Lets the user command a cursor ('turtle') to move around and draw stuff",
             "Well-known for 'turtle graphics', but actually a real programming language",
@@ -39,12 +39,32 @@ module.exports = [
         playground: "ninja"
     },
     {
-        headline: "Lindenmayer systems",
+        headline: "What is an L-system?",
         bullets: [
-            "Something about Astrid Lindenmayer",
-            "Axiom and production rules",
-            "Fractals"
+            "A formal grammar that can be used to generate sentences",
+            "Also invented in the late 60s, by Aristid Lindenmayer (hence the 'L'), a botanist",
+            "He used it to model plant growth processes",
+            "We can use turtle graphics to interpret the sentences"
         ]
+    },
+    {
+        headline: "A simple L-system",
+        bullets: [
+            "Alphabet: bites, hits, dog, man",
+            "Rule 1: dog → dog bites man",
+            "Rule 2: man → man hits dog",
+            "Axiom (first sentence): dog",
+            "Derivation 1: dog bites man",
+            "Derivation 2: dog bites man bites man hits dog"
+        ]
+    },
+    {
+        headline: "Snowflake 1",
+        playground: "snowflake1"
+    },
+    {
+        headline: "Snowflake 2",
+        playground: "snowflake2"
     },
     {
         headline: "Dragon",
@@ -53,10 +73,6 @@ module.exports = [
     {
         headline: "Sierpinski triangle",
         playground: "sierpinski"
-    },
-    {
-        headline: "Snowflake",
-        playground: "snowflake"
     },
     {
         headline: "Koch 1",

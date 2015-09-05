@@ -5,6 +5,6 @@ lindenmayer({
         B: '-A+BB++B+A--A-B'
     },
     angle: 60,
-    size: 10,
+    size: 15,
     iterations: 3
 });

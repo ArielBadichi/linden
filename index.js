@@ -17,7 +17,7 @@ var Nav = React.createClass({
         var current = this.props.current;
         var num = this.props.num;
         var onSelect = this.props.onSelect;
-        return <Pagination bsSize="large" items={num} activePage={current} onSelect={onSelect} prev next />;
+        return <Pagination bsSize="medium" items={num} activePage={current} onSelect={onSelect} prev next />;
     }
 });
 
