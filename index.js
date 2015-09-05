@@ -100,7 +100,7 @@ var Slide = React.createClass({
     },
     componentDidMount: function() {
         if (this.props.description.playground) {
-            var url = "/snippets/" + this.props.description.playground + ".js";
+            var url = "snippets/" + this.props.description.playground + ".js";
             superagent.get(url)
                 .end(function(err, res) {
                     if (err) {
