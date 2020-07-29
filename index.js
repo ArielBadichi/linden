@@ -2,7 +2,7 @@ var React = require("react");
 var ReactBootstrap = require("react-bootstrap");
 var superagent = require("superagent");
 var CodeMirror = require("react-codemirror");
-require("react-codemirror/node_modules/codemirror/mode/javascript/javascript");
+require("codemirror/mode/javascript/javascript");
 var Turtle = require("./turtle");
 var lindenmayerCtor = require("./lindenmayer");
 
@@ -53,7 +53,12 @@ var Playground = React.createClass({
     },
     run: function() {
         var startTime = Date.now();
-        eval(this.props.code);
+        try {
+            eval(this.props.code);
+        }
+        catch (err) {
+            console.log(err);
+        }
         if (this.turtle) {
             this.turtle.call(function() {
                 var endTime = Date.now();
@@ -72,7 +77,13 @@ var Playground = React.createClass({
             lineNumbers: true,
             mode: "javascript",
             autofocus: true,
-            indentUnit: 4
+            indentUnit: 4,
+            extraKeys: {
+                "Ctrl-Enter": function(cm) {
+                    this.reset();
+                    this.run();
+                }.bind(this)
+            }
         };
         var editor = <CodeMirror value={this.props.code} options={options} onChange={this.props.onChange} />;
 
